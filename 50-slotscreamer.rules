@@ -1,0 +1,10 @@
+# Copy this file to /etc/udev/rules.d/
+# run "sudo udevadm control --reload-rules"
+# then unplug and reinsert usb cable to trigger permission change
+
+ACTION!="add|change", GOTO="slotscreamer_rules_end"
+SUBSYSTEM!="usb|tty|hidraw", GOTO="slotscreamer_rules_end"
+
+ATTRS{idVendor}=="0525", ATTRS{idProduct}=="3380", MODE="660", GROUP="plugdev", TAG+="uaccess"
+
+LABEL="slotscreamer_rules_end"
