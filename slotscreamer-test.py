@@ -1,8 +1,12 @@
-import usb.core
-import usb.util
+## For older versions of python-usb library import
+## base usb module instead of usb.legacy
+
+import usb.legacy as usb
+#import usb
 import sys
 import struct
 import math
+import array
 
 pciin = None
 pciout = None
@@ -31,7 +35,7 @@ def readPCI(address,byteCount):
         pciout.write(struct.pack('BBBBI',0xcf,0,0,0x40,baseAddress))
         cache+=pciin.read(0x100)
         baseAddress+=256
-    return bytes(cache[offset:offset+byteCount])
+    return array.array('B', cache[offset:offset+byteCount])
 
 
 def initPCI():
@@ -43,6 +47,7 @@ def initPCI():
     dev = usb.core.find(idVendor=0x0525, idProduct=0x3380)
     if dev is None:
         raise ValueError('Device not found')
+    dev.reset()
     dev.set_configuration()
     cfg = dev.get_active_configuration()
     intf=cfg[0,0]
@@ -108,14 +113,27 @@ def writePCI(address, buf):
     global cache
     cache=[]        
 
+    
+def printable(char):
+    if char < 32 or char > 127:
+        return 32
+    else:
+        return char
 
 
-#initPCI()
-#readPCI(0x1000000,100)
+def hexprint(data):
+    for i in range(0, len(data), 16):
+        hex_str = ' '.join("%02x" % b for b in data[i:i+16])
+        ascii_str = ''.join("%c" % printable(b) for b in data[i:i+16])
+        print("{:48}| {}".format(hex_str, ascii_str))
+
+
+
+## Example usages
+initPCI()
+hexprint(readPCI(0x1000000,100))
 #writePCI(0x1000010,[0xff,0xff,0xff,0xff])
 #readPCI(0x1000000,100)
-
-
 
 #readPCI(0,0x82)
 
@@ -126,6 +144,3 @@ def writePCI(address, buf):
 #pciout.write(b'\xcf\x00\x00\x01\x00\x00\x00\x00')
 #str=pciin.read(10000)
 #sys.stdout.write('Read: '+str+'\n')
-
-
-#def 

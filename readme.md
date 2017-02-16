@@ -33,7 +33,7 @@ Making a SLOTSCREAMER out of a PLX USB3380:
 All the months of toiling trying to prototype with linux usb gadget drivers were overcomplicated and went nowhere.
 If you build an eeprom image all you have to do is set a usb enabled bit after pcie powers up. All the other default settings are actually completely sufficient to make it all work. SLOTSCREAMER.bin is attached. PLX provides windows and linux tools to program the firmware, or you could use a hardware programmer. To use the plx tools:
 
-* download sdk, linux package only, from: http://www.plxtech.com/products/sdk/ You need to register to get access.
+* download sdk, linux package only, from: https://www.broadcom.com/products/pcie-switches-bridges/software-dev-kit
 * unzip, then untar
 * export PLX_SDK_DIR=..pathtofiles/PlxSdk
 * cd PlxSdk/PlxApi
@@ -53,10 +53,13 @@ confirm loading: "eep"
 
 That's it, your usb3380 reference board is now a SLOTSCREAMER
 
-
 Notes for the PP3380:
 ====================
-The PP3380 may have a larger eeprom that requires two-byte addressing, which PlxCm doesn't do by default. In that case use PlxEe and specify the address width and file to load. You also have to bridge jumper 3 to connect the eeprom.
+You have to bridge jumper 3 to connect the eeprom.
+
+The PP3380 uses the 3.3Vaux power rail by default (blue LED on the card will light up when power is present). Unfortunately, this power rail is optional in some configurations (such as SFF-8639) and may not be available. If power cannot be supplied to the 3.3Vaux input, The PP3380 appears to be reconfigurable to use main 3.3V power by moving a surface mount resistor. 
+
+The PP3380 may have a larger eeprom that requires two-byte addressing, which PlxCm doesn't do by default. In that case use PlxEe and specify the address width and file to load. 
 * cd Samples/PlxEe
 * make
 * ./App/PlxEe -w 2 -l slotscreamer.bin
@@ -85,5 +88,3 @@ The changes are essentially:
 * implemented caching for reads
 * implemented cache invalidation after writes
 * implemented proper responses to non-dword-aligned accesses
-
-
